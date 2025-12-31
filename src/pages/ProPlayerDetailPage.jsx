@@ -66,15 +66,15 @@ export default function ProPlayerDetailPage({ player, onBack, onLoadSettings }) 
 
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                <div className="text-3xl font-bold">{player.mouse.sens}</div>
+                <div className="text-3xl font-bold">{player.sens}</div>
                 <div className="text-sm text-white/80">Sensitivity</div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                <div className="text-3xl font-bold">{player.mouse.dpi}</div>
+                <div className="text-3xl font-bold">{player.dpi}</div>
                 <div className="text-sm text-white/80">DPI</div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                <div className="text-3xl font-bold">{player.mouse.edpi}</div>
+                <div className="text-3xl font-bold">{player.edpi}</div>
                 <div className="text-sm text-white/80">eDPI</div>
               </div>
             </div>
@@ -102,160 +102,49 @@ export default function ProPlayerDetailPage({ player, onBack, onLoadSettings }) 
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
               <span className="text-gray-600 dark:text-gray-400">Sensitivity</span>
-              <span className="font-bold text-green-600 dark:text-green-400 text-lg">{player.mouse.sens}</span>
+              <span className="font-bold text-green-600 dark:text-green-400 text-lg">{player.sens}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
               <span className="text-gray-600 dark:text-gray-400">DPI</span>
-              <span className="font-bold text-orange-600 dark:text-orange-400 text-lg">{player.mouse.dpi}</span>
+              <span className="font-bold text-orange-600 dark:text-orange-400 text-lg">{player.dpi}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
               <span className="text-gray-600 dark:text-gray-400">eDPI</span>
-              <span className="font-bold text-purple-600 dark:text-purple-400 text-lg">{player.mouse.edpi}</span>
+              <span className="font-bold text-purple-600 dark:text-purple-400 text-lg">{player.edpi}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
               <span className="text-gray-600 dark:text-gray-400">Polling Rate</span>
-              <span className="font-bold dark:text-white">{player.mouse.pollingRate} Hz</span>
+              <span className="font-bold dark:text-white">{player.pollingRate} Hz</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
               <span className="text-gray-600 dark:text-gray-400">Mouse</span>
-              <span className="font-bold dark:text-white text-right">{player.mouse.mouseName}</span>
+              <span className="font-bold dark:text-white text-right">{player.mouseName}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
               <span className="text-gray-600 dark:text-gray-400">Mousepad</span>
-              <span className="font-bold dark:text-white text-right">{player.mouse.mousepadName}</span>
+              <span className="font-bold dark:text-white text-right">{player.mousepad}</span>
             </div>
           </div>
         </div>
 
-        {/* Monitor Settings */}
+        {/* Peripherals */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
           <h2 className="font-bold text-2xl dark:text-white mb-4 flex items-center gap-2">
-            <span className="text-3xl">🖥️</span> Monitor Settings
+            <span className="text-3xl">⚙️</span> Peripherals
           </h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-              <span className="text-gray-600 dark:text-gray-400">Monitor</span>
-              <span className="font-bold dark:text-white text-right">{player.monitor.monitorName}</span>
+              <span className="text-gray-600 dark:text-gray-400">Keyboard</span>
+              <span className="font-bold dark:text-white text-right">{player.keyboard}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-              <span className="text-gray-600 dark:text-gray-400">Refresh Rate</span>
-              <span className="font-bold text-blue-600 dark:text-blue-400 text-lg">{player.monitor.refreshRate} Hz</span>
+              <span className="text-gray-600 dark:text-gray-400">Headset</span>
+              <span className="font-bold dark:text-white text-right">{player.headset}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
               <span className="text-gray-600 dark:text-gray-400">Resolution</span>
-              <span className="font-bold dark:text-white">{player.monitor.resolution}</span>
+              <span className="font-bold dark:text-white text-right">{player.resolution}</span>
             </div>
-          </div>
-        </div>
-
-        {/* In-Game Settings */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-          <h2 className="font-bold text-2xl dark:text-white mb-4 flex items-center gap-2">
-            <span className="text-3xl">🎮</span> In-Game Settings
-          </h2>
-          <div className="space-y-3">
-            {player.ingame.fov && (
-              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                <span className="text-gray-600 dark:text-gray-400">FOV</span>
-                <span className="font-bold dark:text-white">{player.ingame.fov}</span>
-              </div>
-            )}
-            <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-              <span className="text-gray-600 dark:text-gray-400">Aspect Ratio</span>
-              <span className="font-bold dark:text-white">{player.ingame.aspectRatio}</span>
-            </div>
-            {player.ingame.scopedSens && (
-              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                <span className="text-gray-600 dark:text-gray-400">Scoped Sens</span>
-                <span className="font-bold dark:text-white">{player.ingame.scopedSens}</span>
-              </div>
-            )}
-            {player.ingame.adsMultiplier && (
-              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                <span className="text-gray-600 dark:text-gray-400">ADS Multiplier</span>
-                <span className="font-bold dark:text-white">{player.ingame.adsMultiplier}</span>
-              </div>
-            )}
-            <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-              <span className="text-gray-600 dark:text-gray-400">Graphics</span>
-              <span className="font-bold dark:text-white">{player.ingame.graphics}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Crosshair Settings */}
-        {player.crosshair && (
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-            <h2 className="font-bold text-2xl dark:text-white mb-4 flex items-center gap-2">
-              <span className="text-3xl">🎯</span> Crosshair Settings
-            </h2>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                <span className="text-gray-600 dark:text-gray-400">Color</span>
-                <span className="font-bold dark:text-white">{player.crosshair.color}</span>
-              </div>
-              {player.crosshair.style && (
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                  <span className="text-gray-600 dark:text-gray-400">Style</span>
-                  <span className="font-bold dark:text-white">{player.crosshair.style}</span>
-                </div>
-              )}
-              {player.crosshair.outlines && (
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                  <span className="text-gray-600 dark:text-gray-400">Outlines</span>
-                  <span className="font-bold dark:text-white">{player.crosshair.outlines}</span>
-                </div>
-              )}
-              {player.crosshair.centerDot && (
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                  <span className="text-gray-600 dark:text-gray-400">Center Dot</span>
-                  <span className="font-bold dark:text-white">{player.crosshair.centerDot}</span>
-                </div>
-              )}
-              {player.crosshair.innerLines && (
-                <div className="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
-                  <div className="text-gray-600 dark:text-gray-400 mb-2">Inner Lines</div>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500 dark:text-gray-400">Length:</span>
-                      <span className="font-bold dark:text-white">{player.crosshair.innerLines.length}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500 dark:text-gray-400">Thickness:</span>
-                      <span className="font-bold dark:text-white">{player.crosshair.innerLines.thickness}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500 dark:text-gray-400">Offset:</span>
-                      <span className="font-bold dark:text-white">{player.crosshair.innerLines.offset}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Peripherals */}
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-        <h2 className="font-bold text-2xl dark:text-white mb-4 flex items-center gap-2">
-          <span className="text-3xl">⚙️</span> Peripherals
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl text-center">
-            <div className="text-3xl mb-2">⌨️</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Keyboard</div>
-            <div className="font-bold dark:text-white">{player.gear.keyboard}</div>
-          </div>
-          <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl text-center">
-            <div className="text-3xl mb-2">🎧</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Headset</div>
-            <div className="font-bold dark:text-white">{player.gear.headset}</div>
-          </div>
-          <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl text-center">
-            <div className="text-3xl mb-2">🖱️</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Mousepad</div>
-            <div className="font-bold dark:text-white">{player.gear.mousepad}</div>
           </div>
         </div>
       </div>
