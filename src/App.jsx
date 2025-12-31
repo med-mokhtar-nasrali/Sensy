@@ -1,6 +1,7 @@
 import React from 'react'
 import Converter from './pages/Converter'
 import { ThemeProvider, useTheme } from './context/ThemeContext'
+import { Analytics } from '@vercel/analytics/react'
 
 function AppContent() {
   const { darkMode, toggleDarkMode } = useTheme()
@@ -91,6 +92,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <AppContent />
+      <Analytics />
     </ThemeProvider>
   )
 }
