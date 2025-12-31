@@ -6,9 +6,10 @@ export default function SensitivityForm({ onResult, proSettings }) {
   const [conversionMode, setConversionMode] = useState('game') // 'game' or 'dpi'
   const [fromGame, setFromGame] = useState('Valorant')
   const [toGame, setToGame] = useState('CS2')
-  const [fromSens, setFromSens] = useState(1)
-  const [fromDpi, setFromDpi] = useState(800)
-  const [toDpi, setToDpi] = useState(800)
+  const [fromSens, setFromSens] = useState('1')
+  const [fromDpi, setFromDpi] = useState('800')
+  const [toDpi, setToDpi] = useState('')
+  const [toDpiManuallySet, setToDpiManuallySet] = useState(false)
   const [loadedProName, setLoadedProName] = useState(null)
   const [isConverting, setIsConverting] = useState(false)
 
@@ -16,15 +17,23 @@ export default function SensitivityForm({ onResult, proSettings }) {
   useEffect(() => {
     if (proSettings) {
       setFromGame(proSettings.game)
-      setFromSens(proSettings.sens)
-      setFromDpi(proSettings.dpi)
-      setToDpi(proSettings.dpi)
+      setFromSens(String(proSettings.sens))
+      setFromDpi(String(proSettings.dpi))
+      setToDpi(String(proSettings.dpi))
+      setToDpiManuallySet(true)
       setLoadedProName(proSettings.playerName)
       
       // Clear the notification after 3 seconds
       setTimeout(() => setLoadedProName(null), 3000)
     }
   }, [proSettings])
+
+  // Auto-sync toDpi with fromDpi if user hasn't manually set it
+  useEffect(() => {
+    if (!toDpiManuallySet && fromDpi) {
+      setToDpi(fromDpi)
+    }
+  }, [fromDpi, toDpiManuallySet])
 
   const handleConvert = () => {
     setIsConverting(true)
@@ -37,62 +46,78 @@ export default function SensitivityForm({ onResult, proSettings }) {
   }
 
   const performConversion = () => {
+    // Validate and use defaults
+    const sensValue = Number(fromSens) || 0
+    const dpiValue = Number(fromDpi) || 800
+    const targetDpiValue = Number(toDpi) || dpiValue // Default to fromDpi if toDpi is empty
+    
+    if (sensValue <= 0 || dpiValue <= 0 || targetDpiValue <= 0) {
+      alert('Please enter valid positive values for sensitivity and DPI.')
+      return
+    }
+
     if (conversionMode === 'game') {
       // Game to Game conversion (now supports different DPIs)
       const result = convertSensitivity({ 
-        fromSens: Number(fromSens), 
-        fromDpi: Number(fromDpi), 
+        fromSens: sensValue, 
+        fromDpi: dpiValue, 
         fromYaw: GAMES[fromGame].yaw, 
-        toDpi: Number(toDpi), 
+        toDpi: targetDpiValue, 
         toYaw: GAMES[toGame].yaw 
       })
-      const fromEdpi = eDPI(Number(fromDpi), Number(fromSens))
-      const toEdpi = eDPI(Number(toDpi), result.toSens)
-      const cm360 = cmPer360(Number(fromDpi), Number(fromSens), GAMES[fromGame].yaw)
+      const fromEdpi = eDPI(dpiValue, sensValue)
+      const toEdpi = eDPI(targetDpiValue, result.toSens)
+      const cm360 = cmPer360(dpiValue, sensValue, GAMES[fromGame].yaw)
       onResult({ 
         converted: Number(result.toSens.toFixed(4)), 
-        fromSens: Number(fromSens),
+        fromSens: sensValue,
         fromEdpi: Number(fromEdpi.toFixed(2)),
         toEdpi: Number(toEdpi.toFixed(2)),
         cm360: Number(cm360.toFixed(2)), 
         fromGame, 
         toGame,
         mode: 'game',
-        fromDpi: Number(fromDpi),
-        toDpi: Number(toDpi),
-        dpiChanged: Number(fromDpi) !== Number(toDpi)
+        fromDpi: dpiValue,
+        toDpi: targetDpiValue,
+        dpiChanged: dpiValue !== targetDpiValue
       })
     } else {
       // DPI to DPI conversion
       const result = convertSensitivity({ 
-        fromSens: Number(fromSens), 
-        fromDpi: Number(fromDpi), 
+        fromSens: sensValue, 
+        fromDpi: dpiValue, 
         fromYaw: GAMES[fromGame].yaw, 
-        toDpi: Number(toDpi), 
+        toDpi: targetDpiValue, 
         toYaw: GAMES[fromGame].yaw 
       })
-      const fromEdpi = eDPI(Number(fromDpi), Number(fromSens))
-      const toEdpi = eDPI(Number(toDpi), result.toSens)
-      const cm360 = cmPer360(Number(fromDpi), Number(fromSens), GAMES[fromGame].yaw)
+      const fromEdpi = eDPI(dpiValue, sensValue)
+      const toEdpi = eDPI(targetDpiValue, result.toSens)
+      const cm360 = cmPer360(dpiValue, sensValue, GAMES[fromGame].yaw)
       onResult({ 
         converted: Number(result.toSens.toFixed(4)), 
-        fromSens: Number(fromSens),
+        fromSens: sensValue,
         edpi: Number(toEdpi.toFixed(2)),
         fromEdpi: Number(fromEdpi.toFixed(2)), 
         cm360: Number(cm360.toFixed(2)), 
         fromGame, 
         toGame: fromGame,
         mode: 'dpi',
-        fromDpi: Number(fromDpi),
-        toDpi: Number(toDpi)
+        fromDpi: dpiValue,
+        toDpi: targetDpiValue
       })
     }
   }
 
   const handleReset = () => {
-    setFromSens(1)
-    setFromDpi(800)
-    setToDpi(800)
+    setFromSens('1')
+    setFromDpi('800')
+    setToDpi('')
+    setToDpiManuallySet(false)
+  }
+
+  const handleToDpiChange = (value) => {
+    setToDpi(value)
+    setToDpiManuallySet(value !== '')
   }
 
   return (
@@ -175,21 +200,21 @@ export default function SensitivityForm({ onResult, proSettings }) {
             <label className="block text-sm font-semibold dark:text-gray-200 mb-2 flex items-center gap-2">
               <span className="text-green-500">🎯</span> Current Sensitivity
             </label>
-            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" type="number" step="0.001" min="0" value={fromSens} onChange={e => setFromSens(Math.max(0, Number(e.target.value) || 0))} />
+            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" type="number" step="0.001" value={fromSens} onChange={e => setFromSens(e.target.value)} />
           </div>
 
           <div>
             <label className="block text-sm font-semibold dark:text-gray-200 mb-2 flex items-center gap-2">
               <span className="text-orange-500">🖱️</span> Current DPI
             </label>
-            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" type="number" min="1" max="50000" value={fromDpi} onChange={e => setFromDpi(Math.max(1, Math.min(50000, Number(e.target.value) || 1)))} />
+            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" type="number" value={fromDpi} onChange={e => setFromDpi(e.target.value)} />
           </div>
 
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold dark:text-gray-200 mb-2 flex items-center gap-2">
-              <span className="text-red-500">🎯</span> Target DPI
+              <span className="text-red-500">🎯</span> Target DPI <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(defaults to current DPI)</span>
             </label>
-            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all" type="number" min="1" max="50000" value={toDpi} onChange={e => setToDpi(Math.max(1, Math.min(50000, Number(e.target.value) || 1)))} />
+            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all" type="number" value={toDpi} onChange={e => handleToDpiChange(e.target.value)} placeholder={fromDpi || '800'} />
           </div>
         </div>
       ) : (
@@ -211,21 +236,21 @@ export default function SensitivityForm({ onResult, proSettings }) {
             <label className="block text-sm font-semibold dark:text-gray-200 mb-2 flex items-center gap-2">
               <span className="text-green-500">🎯</span> Current Sensitivity
             </label>
-            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" type="number" step="0.001" min="0" value={fromSens} onChange={e => setFromSens(Math.max(0, Number(e.target.value) || 0))} />
+            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" type="number" step="0.001" value={fromSens} onChange={e => setFromSens(e.target.value)} />
           </div>
 
           <div>
             <label className="block text-sm font-semibold dark:text-gray-200 mb-2 flex items-center gap-2">
               <span className="text-orange-500">🖱️</span> Current DPI
             </label>
-            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" type="number" min="1" max="50000" value={fromDpi} onChange={e => setFromDpi(Math.max(1, Math.min(50000, Number(e.target.value) || 1)))} />
+            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" type="number" value={fromDpi} onChange={e => setFromDpi(e.target.value)} />
           </div>
 
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold dark:text-gray-200 mb-2 flex items-center gap-2">
-              <span className="text-purple-500">🎯</span> Target DPI
+              <span className="text-purple-500">🎯</span> Target DPI <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(defaults to current DPI)</span>
             </label>
-            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all" type="number" min="1" max="50000" value={toDpi} onChange={e => setToDpi(Math.max(1, Math.min(50000, Number(e.target.value) || 1)))} />
+            <input className="mt-1 block w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all" type="number" value={toDpi} onChange={e => handleToDpiChange(e.target.value)} placeholder={fromDpi || '800'} />
           </div>
         </div>
       )}
