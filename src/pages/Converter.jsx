@@ -11,6 +11,20 @@ export default function Converter() {
   const [proSettings, setProSettings] = useState(null)
   const [showReactionTest, setShowReactionTest] = useState(false)
 
+  // Check for loaded pro settings from localStorage
+  useEffect(() => {
+    const loadedSettings = localStorage.getItem('loadedProSettings')
+    if (loadedSettings) {
+      try {
+        const settings = JSON.parse(loadedSettings)
+        setProSettings(settings)
+        localStorage.removeItem('loadedProSettings') // Clear after loading
+      } catch (e) {
+        console.error('Failed to load pro settings:', e)
+      }
+    }
+  }, [])
+
   // Add to history when result changes and show modal
   useEffect(() => {
     if (result && window.addToHistory) {
